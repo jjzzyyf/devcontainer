@@ -1,0 +1,54 @@
+name: aws-dev-container-python
+
+services:
+    app:
+        image: mcr.microsoft.com/devcontainers/python
+
+        depends_on:
+            - dynamodb
+            # - localstack
+
+        volumes:
+            - ../..:/workspaces:cached
+
+        networks:
+            - awsnet
+
+        ports:
+            - 3000:3000
+
+        environment:
+            - AWS_ACCESS_KEY_ID=foo
+            - AWS_SECRET_ACCESS_KEY=bar
+            - AWS_REGION=us-west-1
+            - AWS_ENDPOINT=http://localstack:4566
+            - DYNAMODB_ENDPOINT=http://dynamodb:8000
+
+        stdin_open: true
+
+    # localstack:
+    #     image: localstack/localstack
+
+    #     ports:
+    #         - 4566:4566
+    #         - 4510-4559:4510-4559
+
+    #     networks:
+    #         - awsnet
+
+    #     environment:
+    #         - SERVICES=sqs
+    #         - DEFAULT_REGION=us-west-1
+
+    dynamodb:
+        image: amazon/dynamodb-local
+
+        ports:
+            - 8000:8000
+
+        networks:
+            - awsnet
+
+networks:
+    awsnet:
+        driver: bridge
